@@ -54,11 +54,11 @@ public class FacultyController {
     }
 
     @DeleteMapping("{id}") // DELETE http://localhost:8080/faculty/2
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable long id) {
-        Faculty faculty = facultyService.deleteFaculty(id);
-        if (faculty == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(faculty, HttpStatus.OK);
+    public ResponseEntity deleteFaculty(@PathVariable long id) {
+        facultyService.deleteFaculty(id);
+//        if (faculty == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

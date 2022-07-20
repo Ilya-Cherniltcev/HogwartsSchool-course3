@@ -53,11 +53,11 @@ public class StudentController {
     }
 
     @DeleteMapping("{id}") // DELETE http://localhost:8080/student/1
-    public ResponseEntity<Student> deleteStudent(@PathVariable long id) {
-        Student student = studentService.deleteStudent(id);
-        if (student == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(student, HttpStatus.OK);
+    public ResponseEntity deleteStudent(@PathVariable long id) {
+        studentService.deleteStudent(id);
+//        if (student == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

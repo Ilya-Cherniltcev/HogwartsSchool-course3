@@ -1,21 +1,27 @@
 package ru.hogwarts.school.model;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.persistence.Id;
 
+import javax.persistence.GeneratedValue;
+
+import javax.persistence.Entity;
 import java.util.Objects;
 
+@Entity
 public class Student {
+    @Id
+    @GeneratedValue
     private long id;
     private String name;
     private int age;
 
-    public Student(long id, String name, int age) {
-        this.id = id;
-        this.name = StringUtils.capitalize(StringUtils.lowerCase(name));
-        this.age = age;
-    }
+//    public Student(long id, String name, int age) {
+//        this.id = id;
+//        this.name = StringUtils.capitalize(StringUtils.lowerCase(name));
+//        this.age = age;
+//    }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

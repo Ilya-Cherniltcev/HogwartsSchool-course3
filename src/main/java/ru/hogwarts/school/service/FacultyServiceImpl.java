@@ -3,56 +3,43 @@ package ru.hogwarts.school.service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repositories.FacultyRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
-    private final Map<Long, Faculty> faculties = new HashMap<>();
-    private long id = 0;
 
+    private final FacultyRepository facultyRepository;
+
+    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
+    }
 
     @Override
     public Faculty createFaculty(Faculty faculty) {
-        faculty.setId(++id);
-        faculties.put(id, faculty);
-        return faculty;
+        return facultyRepository.save(faculty);
     }
 
     @Override
     public Faculty getFaculty(long idFac) {
-        if (faculties.containsKey(idFac)) {
-            return faculties.get(idFac);
-        }
-        return null;
+        return facultyRepository.findById(idFac).get();
     }
 
     // ---------- фильтрация по цвету --------------------
     @Override
     public Collection<Faculty> filter(String color) {
         String colorWriteCase = StringUtils.capitalize(StringUtils.lowerCase(color));
-        return faculties.values()
-                .stream().filter(e -> e.getColor().equals(colorWriteCase))
-                .collect(Collectors.toList());
+        return facultyRepository.findByColor(colorWriteCase);
     }
 
     @Override
     public Faculty updateFaculty(Faculty faculty) {
-        if (faculties.containsKey(faculty.getId())) {
-            faculties.replace(faculty.getId(), faculty);
-            return faculty;
-        }
-        return null;
+        return facultyRepository.save(faculty);
     }
 
     @Override
-    public Faculty deleteFaculty(long idFac) {
-        if (faculties.containsKey(idFac)) {
-            return faculties.remove(idFac);
-        }
-        return null;
+    public void deleteFaculty(long idFac) {
+        facultyRepository.deleteById(idFac);
     }
 }

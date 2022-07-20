@@ -12,7 +12,7 @@ public interface FacultyService {
 
     Faculty updateFaculty(Faculty faculty);
 
-    Faculty deleteFaculty(long id);
+    void deleteFaculty(long id);
 
     Collection<Faculty> filter(String color);
 
