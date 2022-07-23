@@ -1,9 +1,9 @@
 package ru.hogwarts.school.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repositories.FacultyRepository;
+import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
 
@@ -11,9 +11,11 @@ import java.util.Collection;
 public class FacultyServiceImpl implements FacultyService {
 
     private final FacultyRepository facultyRepository;
+    private final StudentRepository studentRepository;
 
-    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+    public FacultyServiceImpl(FacultyRepository facultyRepository, StudentRepository studentRepository) {
         this.facultyRepository = facultyRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -26,11 +28,21 @@ public class FacultyServiceImpl implements FacultyService {
         return facultyRepository.findById(idFac).get();
     }
 
-    // ---------- фильтрация по цвету --------------------
     @Override
-    public Collection<Faculty> filter(String color) {
-        String colorWriteCase = StringUtils.capitalize(StringUtils.lowerCase(color));
-        return facultyRepository.findByColor(colorWriteCase);
+    public Faculty getFacultyByStudentId(long studId) {
+        return facultyRepository.getFacultyByStudentsId(studId);
+    }
+
+    // ---------- фильтрация по цвету  --------------------
+    @Override
+    public Collection<Faculty> filterFacultyByColorIgnoreCase(String color) {
+        return facultyRepository.findFacultyByColorIgnoreCase(color);
+    }
+
+    // ---------- фильтрация по имени  --------------------
+    @Override
+    public Collection<Faculty> filterFacultyByNameIgnoreCase(String name) {
+        return facultyRepository.findFacultyByNameIgnoreCase(name);
     }
 
     @Override
@@ -42,4 +54,5 @@ public class FacultyServiceImpl implements FacultyService {
     public void deleteFaculty(long idFac) {
         facultyRepository.deleteById(idFac);
     }
+
 }

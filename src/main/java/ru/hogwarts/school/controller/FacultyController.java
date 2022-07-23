@@ -26,14 +26,27 @@ public class FacultyController {
         return new ResponseEntity<>(faculty, HttpStatus.OK);
     }
 
-    // =====   фильтруем факультеты по цвету ===========================
-    @GetMapping("filter/{color}") // GET http://localhost:8080/faculty/filter/White
-    public ResponseEntity<Collection<Faculty>> filterFacultiesByColor(@PathVariable String color) {
-        Collection<Faculty> colorFaculty = facultyService.filter(color);
-        if (colorFaculty.isEmpty()) {
+    // ***********  находим факультет у студента с заданным id
+    @GetMapping("id") // GET http://localhost:8080/faculty/id
+    public ResponseEntity<Faculty> getFacultyByStudentId(@RequestParam long studId) {
+        return new ResponseEntity<>(facultyService.getFacultyByStudentId(studId), HttpStatus.OK);
+    }
+
+    // =====   фильтруем факультеты по цвету или имени ===========================
+    @GetMapping("filter") // GET http://localhost:8080/faculty/filter/White (/Хогвартс)
+    public ResponseEntity<Collection<Faculty>> filterFacultiesByColorOrName(@RequestParam(required = false) String name,
+                                                                            @RequestParam(required = false) String color) {
+        Collection<Faculty> dataFaculty = null;
+        if (name != null && !name.isBlank() && color == null) {
+            dataFaculty = facultyService.filterFacultyByNameIgnoreCase(name);
+        }
+        if (color != null && !color.isBlank() && name == null) {
+            dataFaculty = facultyService.filterFacultyByColorIgnoreCase(color);
+        }
+        if (dataFaculty == null || dataFaculty.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(colorFaculty, HttpStatus.OK);
+        return new ResponseEntity<>(dataFaculty, HttpStatus.OK);
     }
 
     @PostMapping // POST http://localhost:8080/faculty
@@ -56,9 +69,6 @@ public class FacultyController {
     @DeleteMapping("{id}") // DELETE http://localhost:8080/faculty/2
     public ResponseEntity deleteFaculty(@PathVariable long id) {
         facultyService.deleteFaculty(id);
-//        if (faculty == null) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

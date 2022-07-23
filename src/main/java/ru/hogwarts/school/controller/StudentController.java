@@ -26,10 +26,26 @@ public class StudentController {
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
-    // =====   фильтруем студентов по возрасту ===========================
+    // ******** определяем всех студентов по id факультета ************8
+    @GetMapping("id") // GET http://localhost:8080/student/id
+    public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@RequestParam long facId) {
+        return new ResponseEntity<>(studentService.getAllStudentsByFacultyId(facId), HttpStatus.OK);
+    }
+
+    // =====   фильтруем студентов по конкретному возрасту ===========================
     @GetMapping("filter/{age}") // GET http://localhost:8080/student/filter/14
     public ResponseEntity<Collection<Student>> filterStudentsByAge(@PathVariable int age) {
         Collection<Student> ageStudent = studentService.filter(age);
+        if (ageStudent.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(ageStudent, HttpStatus.OK);
+    }
+
+    // =====   фильтруем студентов по возрасту в промежутке ===========================
+    @GetMapping("filter") // GET http://localhost:8080/student/filter
+    public ResponseEntity<Collection<Student>> filterStudentsByAge(@RequestParam int minAge, @RequestParam int maxAge) {
+        Collection<Student> ageStudent = studentService.findStudentsByAgeBetween(minAge, maxAge);
         if (ageStudent.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -55,9 +71,6 @@ public class StudentController {
     @DeleteMapping("{id}") // DELETE http://localhost:8080/student/1
     public ResponseEntity deleteStudent(@PathVariable long id) {
         studentService.deleteStudent(id);
-//        if (student == null) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
