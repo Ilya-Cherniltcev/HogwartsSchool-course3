@@ -14,9 +14,7 @@ public interface FacultyService {
 
     void deleteFaculty(long id);
 
-    Collection<Faculty> filterFacultyByNameIgnoreCase(String name);
-
-    Collection<Faculty> filterFacultyByColorIgnoreCase(String color);
+    Collection<Faculty> filterFacultyByColorOrByName(String color, String name);
 
     Faculty getFacultyByStudentId(long studId);
 

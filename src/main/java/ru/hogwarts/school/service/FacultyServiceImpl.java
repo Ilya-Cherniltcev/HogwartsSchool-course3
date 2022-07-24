@@ -33,16 +33,10 @@ public class FacultyServiceImpl implements FacultyService {
         return facultyRepository.getFacultyByStudentsId(studId);
     }
 
-    // ---------- фильтрация по цвету  --------------------
+    // ---------- фильтрация по цвету или имени --------------------
     @Override
-    public Collection<Faculty> filterFacultyByColorIgnoreCase(String color) {
-        return facultyRepository.findFacultyByColorIgnoreCase(color);
-    }
-
-    // ---------- фильтрация по имени  --------------------
-    @Override
-    public Collection<Faculty> filterFacultyByNameIgnoreCase(String name) {
-        return facultyRepository.findFacultyByNameIgnoreCase(name);
+    public Collection<Faculty> filterFacultyByColorOrByName(String color, String name) {
+        return facultyRepository.getFacultyByColorIgnoreCaseOrNameIgnoreCase(color, name);
     }
 
     @Override

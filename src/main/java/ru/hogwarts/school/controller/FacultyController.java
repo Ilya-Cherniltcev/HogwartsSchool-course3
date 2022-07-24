@@ -33,21 +33,18 @@ public class FacultyController {
     }
 
     // =====   фильтруем факультеты по цвету или имени ===========================
-    @GetMapping("filter") // GET http://localhost:8080/faculty/filter/White (/Хогвартс)
-    public ResponseEntity<Collection<Faculty>> filterFacultiesByColorOrName(@RequestParam(required = false) String name,
-                                                                            @RequestParam(required = false) String color) {
+    @GetMapping("filter") // GET http://localhost:8080/faculty/filter/Зеленый (/Хогвартс)
+    public ResponseEntity<Collection<Faculty>> filterFacultiesByColorOrName(@RequestParam String colorOrName) {
         Collection<Faculty> dataFaculty = null;
-        if (name != null && !name.isBlank() && color == null) {
-            dataFaculty = facultyService.filterFacultyByNameIgnoreCase(name);
-        }
-        if (color != null && !color.isBlank() && name == null) {
-            dataFaculty = facultyService.filterFacultyByColorIgnoreCase(color);
-        }
+        String color = colorOrName;
+        String name = colorOrName;
+        dataFaculty = facultyService.filterFacultyByColorOrByName(color, name);
         if (dataFaculty == null || dataFaculty.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(dataFaculty, HttpStatus.OK);
     }
+// ---------------------------------------------------------------------------------------------
 
     @PostMapping // POST http://localhost:8080/faculty
     public ResponseEntity<Faculty> createNewFaculty(@RequestBody Faculty faculty) {
