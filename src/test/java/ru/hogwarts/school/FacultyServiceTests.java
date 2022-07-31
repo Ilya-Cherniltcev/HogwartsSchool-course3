@@ -1,74 +1,108 @@
-//package ru.hogwarts.school;
-//
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import ru.hogwarts.school.model.Faculty;
-//import ru.hogwarts.school.service.FacultyService;
-//import ru.hogwarts.school.service.FacultyServiceImpl;
-//
-//import java.util.Collection;
-//
-//import static ru.hogwarts.school.FacultyServiceConstants.*;
-//
-//@SpringBootTest
-//class FacultyServiceTests {
-//    FacultyService facultyService = new FacultyServiceImpl();
-//
-//    @BeforeEach
-//    void setup() {
-//        Faculty tempFaculty = facultyService.createFaculty(new Faculty(1, "1st faculty", "Red"));
-//        tempFaculty = facultyService.createFaculty(new Faculty(2, "2nd faculty", "White"));
-//        tempFaculty = facultyService.createFaculty(new Faculty(3, "3d faculty", "White"));
-//    }
-//
-//    @Test
-//    void shouldReturnNewFaculty() {
-//        Faculty actual = facultyService.createFaculty(CREATE_FACULTY);
-//        Assertions.assertEquals(CREATE_FACULTY, actual);
-//    }
-//
-//    @Test
-//    void shouldReturnExistFacultyById() {
-//        Faculty actual = facultyService.getFaculty(2);
-//        Assertions.assertEquals(EXIST_FACULTY, actual);
-//    }
-//
-//    @Test
-//    void shouldReturnCollectionOfFaculties() {
-//        Collection<Faculty> actualFilterCollection = facultyService.filter(FILTER_COLOR);
-//        Assertions.assertEquals(FACULTY_FILTER_COLLECTION, actualFilterCollection);
-//    }
-//
-//    @Test
-//    void shouldReturnUpdateFaculty() {
-//        Faculty actual = facultyService.updateFaculty(UPDATE_FACULTY);
-//        Assertions.assertEquals(UPDATE_FACULTY, actual);
-//    }
-//
-//    @Test
-//    void shouldReturnFacultyIfSuccessDeletingById() {
-//        Faculty actual = facultyService.deleteFaculty(2);
-//        Assertions.assertEquals(EXIST_FACULTY, actual);
-//    }
-//
-//    // ==========================
-//    @Test
-//    void shouldReturnNullIfDoesNotContainKeyByGetting() {
-//        Faculty facultyNull = facultyService.getFaculty(WRONG_FACULTY_NUMBER);
-//        Assertions.assertNull(facultyNull);
-//    }
-//
-//    @Test
-//    void shouldReturnNullIfDoesNotContainKeyByUpdating() {
-//        Faculty facultyNull = facultyService.updateFaculty(WRONG_FACULTY);
-//        Assertions.assertNull(facultyNull);
-//    }
-//
-//    @Test
-//    void shouldReturnNullIfDoesNotContainKeyByDeleting() {
-//        Faculty facultyNull = facultyService.deleteFaculty(WRONG_FACULTY_NUMBER);
-//        Assertions.assertNull(facultyNull);
-//    }
-//}
+package ru.hogwarts.school;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Collections;
+import java.util.Optional;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.hogwarts.school.controller.FacultyController;
+import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repositories.FacultyRepository;
+import ru.hogwarts.school.service.FacultyService;
+
+@WebMvcTest
+class FacultyServiceTests {
+
+   // @Autowired
+    public MockMvc mockMvc;
+
+    @MockBean
+    private FacultyRepository facultyRepository;
+
+    @SpyBean
+    private FacultyService facultyService;
+
+    @InjectMocks
+    private FacultyController facultyController;
+
+    @Test
+    public void testStudents() throws Exception {
+        final String name = "Дьюк Нукем";
+        final String color = "Красный";
+        final long id = 1;
+
+        Faculty faculty = new Faculty();
+        faculty.setId(id);
+        faculty.setName(name);
+        faculty.setColor(color);
+
+        JSONObject facultyObject = new JSONObject();
+        facultyObject.put("id", id);
+        facultyObject.put("name", name);
+        facultyObject.put("color", color);
+
+
+        when(facultyRepository.save(any(Faculty.class))).thenReturn(faculty);
+        when(facultyRepository.findById(eq(id))).thenReturn(Optional.of(faculty));
+        when(facultyRepository.getFacultyByColorIgnoreCaseOrNameIgnoreCase(eq(color), color)).
+                thenReturn(Collections.singleton(faculty));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/faculty")
+                        .content(facultyObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.color").value(color));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/faculty")
+                        .content(facultyObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.color").value(color));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/" + id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(id))
+                .andExpect(jsonPath("$[0].name").value(name))
+                .andExpect(jsonPath("$[0].color").value(color));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty?color=" + color)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.color").value(color));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/faculty/" + id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+}
+
+
+
