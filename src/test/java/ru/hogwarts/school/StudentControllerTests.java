@@ -1,6 +1,8 @@
 package ru.hogwarts.school;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,9 +22,14 @@ import static org.hamcrest.Matchers.notNullValue;
 // ========== Класс тестирования StudentController ===========================
 // ===========================================================================
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StudentServiceTests {
+public class StudentControllerTests {
 
     private final String testStudentName = "Simple test student name";
+    private final int testStudentAge = 22;
+
+    private long studentId;
+    private Student student = new Student();
+    private ResponseEntity<Student> response;
 
     @LocalServerPort
     private int port;
@@ -34,6 +41,28 @@ public class StudentServiceTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
+
+    @BeforeEach
+    public void createTempStudent() {
+        // ------------  создаем временного студента ----------------------
+        // -----------  и уточняем его id   -------------------------------
+        student.setName(testStudentName);
+        student.setAge(testStudentAge);
+
+        String urlPost = "http://localhost:" + port + "/student";
+        response = restTemplate.postForEntity(urlPost, student, Student.class);
+
+        studentId = response.getBody().getId();
+    }
+
+    @AfterEach
+    public void deleteTempStudent() {
+        // ======== удаляем временного студента  =====================================================
+        String urlDel = "http://localhost:" + port + "/student/" + studentId;
+
+        response = restTemplate.exchange(urlDel, HttpMethod.DELETE, null,
+                Student.class, studentId);
+    }
 
     @Test
     public void contextLoads() throws Exception {
@@ -67,28 +96,24 @@ public class StudentServiceTests {
 
     @Test
     public void testCreateNewStudent() throws Exception {
-        // ------------ (1) создаем временного студента ------------------------------------------------
-        // -----------  и возвращаем его id   -------------------------------
-        long studentId = createTestStudent();
-
-        // ========  (2) удаляем временного студента  =====================================================
-        String urlDel = "http://localhost:" + port + "/student/" + studentId;
-
-        ResponseEntity<Student> responseDel = restTemplate.exchange(urlDel, HttpMethod.DELETE, null,
-                Student.class, studentId);
-
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getId(), notNullValue());
+        assertThat(response.getBody().getName(), is(testStudentName));
+        assertThat(response.getBody().getAge(), is(testStudentAge));
     }
 
     @Test
     public void testUpdateStudent() throws Exception {
         Student testStudent = new Student();
         testStudent.setName("Test student");
-        testStudent.setAge(15);
+        int updateStudentAge = 15;
+        testStudent.setAge(updateStudentAge);
+
         // ******************** (1) создаем временного студента ********************
         String urlPost = "http://localhost:" + port + "/student";
         ResponseEntity<Student> responsePost = restTemplate.postForEntity(urlPost, testStudent, Student.class);
         // ___________ определяем id созданного временного студента ___________________________________
-        long studentId = responsePost.getBody().getId();
+        long studentIdUpdate = responsePost.getBody().getId();
 
         // ******************** (2) изменяем временного студента ********************
         String urlUpdate = "http://localhost:" + port + "/student";
@@ -96,28 +121,23 @@ public class StudentServiceTests {
 
         restTemplate.put(urlUpdate, responsePost);
         ResponseEntity<Student> responseUpdate = restTemplate.exchange(urlUpdate, HttpMethod.PUT, responsePost,
-                Student.class, studentId);
+                Student.class, studentIdUpdate);
 
         assertThat(responseUpdate.getStatusCode(), is(HttpStatus.OK));
         assertThat(responseUpdate.getBody().getId(), notNullValue());
-        assertThat(responseUpdate.getBody().getAge(), is(15));
+        assertThat(responseUpdate.getBody().getAge(), is(updateStudentAge));
 
         // ********************  (3) удаляем временного студента  ********************
 
-        String urlDel = "http://localhost:" + port + "/student/" + studentId;
+        String urlDel = "http://localhost:" + port + "/student/" + studentIdUpdate;
 
         ResponseEntity<Student> responseDel = restTemplate.exchange(urlDel, HttpMethod.DELETE, null,
-                Student.class, studentId);
+                Student.class, studentIdUpdate);
 
     }
 
     @Test
     public void testDeleteStudent() throws Exception {
-        // ------------ (1) создаем временного студента ------------------------------------------------
-        // -----------  и возвращаем его id   -------------------------------
-        long studentId = createTestStudent();
-
-        // ********************  (2) удаляем временного студента  ********************
 
         String urlDel = "http://localhost:" + port + "/student/" + studentId;
 
@@ -125,24 +145,6 @@ public class StudentServiceTests {
                 Student.class, studentId);
         assertThat(responseDel.getStatusCode(), is(HttpStatus.OK));
     }
-
-
-    // ========================================================================================
-    private long createTestStudent() {
-        Student student = new Student();
-        student.setName(testStudentName);
-        student.setAge(22);
-
-        String urlPost = "http://localhost:" + port + "/student";
-        ResponseEntity<Student> responsePost = restTemplate.postForEntity(urlPost, student, Student.class);
-        Assertions.assertThat(responsePost.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        assertThat(responsePost.getBody().getId(), notNullValue());
-        assertThat(responsePost.getBody().getName(), is(testStudentName));
-        long studentId = responsePost.getBody().getId();
-        return studentId;
-    }
-
 }
 
 
