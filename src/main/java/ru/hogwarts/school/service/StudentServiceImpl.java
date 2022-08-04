@@ -64,7 +64,7 @@ public class StudentServiceImpl implements StudentService {
 
     // ======= Получение среднего возраста студентов ===============
     @Override
-    public int getAverageAgeOfStudents() {
+    public double getAverageAgeOfStudents() {
         return studentRepository.getAverageAgeOfStudents();
     }
 

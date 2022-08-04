@@ -25,7 +25,7 @@ public interface StudentService {
     int getTotalNumberOfStudents();
 
     // ======= Получение среднего возраста студентов ===============
-    int getAverageAgeOfStudents();
+    double getAverageAgeOfStudents();
 
     // ======= Получение последних 5-ти студентов (у которых больше id) ===============
     List<Student> getLast5Students();
