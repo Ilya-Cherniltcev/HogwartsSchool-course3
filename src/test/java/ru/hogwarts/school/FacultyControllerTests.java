@@ -26,6 +26,8 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.FacultyServiceImpl;
 
+
+// -------------------------------------------------
 @WebMvcTest(controllers = FacultyController.class)
 class FacultyControllerTests {
 
