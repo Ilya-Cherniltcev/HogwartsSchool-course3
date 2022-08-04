@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("student")
@@ -39,10 +40,28 @@ public class StudentController {
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
-    // ******** определяем всех студентов по id факультета ************8
+    // ******** определяем всех студентов по id факультета ************
     @GetMapping("id") // GET http://localhost:8080/student/id
     public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@RequestParam long facId) {
         return new ResponseEntity<>(studentService.getAllStudentsByFacultyId(facId), HttpStatus.OK);
+    }
+
+    // ///////////////// выводим общее число всех студентов \\\\\\\\\\\\\\\\\\\\\\\\\
+    @GetMapping("total") // GET http://localhost:8080/student/total
+    public ResponseEntity<Integer> getNumberOfStudents() {
+        return new ResponseEntity<>(studentService.getTotalNumberOfStudents(), HttpStatus.OK);
+    }
+
+    // ///////////////// выводим средний возраст студентов \\\\\\\\\\\\\\\\\\\\\\\\\
+    @GetMapping("averageAge") // GET http://localhost:8080/student/averageAge
+    public ResponseEntity<Integer> getAvgAgeOfStudents() {
+        return new ResponseEntity<>(studentService.getAverageAgeOfStudents(), HttpStatus.OK);
+    }
+
+    // ///////////////// выводим последних 5-ти студентов (у которых больше id) \\\\\\\\\\\\\\\\\\\\\\\\\
+    @GetMapping("last5") // GET http://localhost:8080/student/last5
+    public ResponseEntity<List<Student>> getLast5Students() {
+        return new ResponseEntity<List<Student>>(studentService.getLast5Students(), HttpStatus.OK);
     }
 
     // =====   фильтруем студентов по конкретному возрасту ===========================
@@ -101,7 +120,7 @@ public class StudentController {
 
     // ***************  (2) скачиваем превьюшку аватарки  ***********************
     @GetMapping(value = "/{id}/avatar/preview")
-    public ResponseEntity<byte[]> downloadAvatarPreview(@PathVariable Long id)  {
+    public ResponseEntity<byte[]> downloadAvatarPreview(@PathVariable Long id) {
         Avatar avatar = studentAvatarService.findStudentAvatar(id);
         // -----------  передаем в http-заголовке тип файла и его длину   ---------
         HttpHeaders headers = new HttpHeaders();
@@ -111,7 +130,6 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(avatar.getPreview());
 
     }
-
 
     // ***************  (3) скачиваем аватарку  ***********************
     @GetMapping(value = "/{id}/avatar")
@@ -127,6 +145,13 @@ public class StudentController {
             response.setContentLength((int) avatar.getFileSize());
             is.transferTo(os);
         }
+    }
+
+    // ***************  (4) получаем списки аватарок постранично (пагинация)  ***********************
+    @GetMapping("avatars") // GET http://localhost:8080/student/avatars
+    public ResponseEntity<List<Avatar>> getAllAvatars(@RequestParam("page") int pageNumber,
+                                                      @RequestParam("size") int pageSize) {
+        return new ResponseEntity<List<Avatar>>(studentAvatarService.getAllAvatars(pageNumber, pageSize), HttpStatus.OK);
     }
 
 }

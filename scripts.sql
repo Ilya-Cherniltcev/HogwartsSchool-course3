@@ -9,3 +9,13 @@ select f.name
 from student as s, faculty as f
 where f.id = s.faculty_id
 and s.name like '%Уизли%';
+
+select count(id)
+from student;
+
+select avg(age) from student;
+
+select * from student order by id desc
+limit 5;
+
+select * from student

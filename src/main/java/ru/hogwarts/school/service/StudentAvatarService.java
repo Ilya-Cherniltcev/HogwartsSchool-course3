@@ -1,6 +1,7 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
@@ -14,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -62,10 +64,10 @@ public class StudentAvatarService {
     }
 
     // -------- делаем превьюшку из аватарки --------------------------------------------------
-    private byte[] generateImagePreview(Path filepath) throws IOException{
+    private byte[] generateImagePreview(Path filepath) throws IOException {
         try (InputStream is = Files.newInputStream(filepath);
              BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             BufferedImage image = ImageIO.read(bis);
 
             int width = image.getWidth();
@@ -76,7 +78,7 @@ public class StudentAvatarService {
             if (height < 1) {
                 height = 150;
             }
-            BufferedImage preview = new BufferedImage(width, height , image.getType());
+            BufferedImage preview = new BufferedImage(width, height, image.getType());
             Graphics2D graphics = preview.createGraphics();
             graphics.drawImage(image, 0, 0, width, height, null);
             graphics.dispose();
@@ -93,6 +95,13 @@ public class StudentAvatarService {
     }
 
 
+    // --------  получаем списки аватарок постранично (пагинация)  --------
+    public List<Avatar> getAllAvatars(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+        return avatarRepository.findAll(pageRequest).getContent();
+    }
+
+    // ==============================================================================
     // ----- определяем расширение файла аватарки ------------------------------
     private String getExtension(String originalFilename) {
         return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
