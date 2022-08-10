@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/scripts/students-index-practice.sql
+  - include:
+      file: liquibase/scripts/faculties-index-practice.sql
