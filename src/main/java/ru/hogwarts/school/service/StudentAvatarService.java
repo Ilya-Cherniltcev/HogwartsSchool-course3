@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 @Transactional
 public class StudentAvatarService {
+    Logger logger = LoggerFactory.getLogger(StudentAvatarService.class);
 
     @Value("${students.avatars.dir.path}")
     private String avatarDir;
@@ -44,6 +47,7 @@ public class StudentAvatarService {
 
         // =====================  читаем файл пользователя -> создаем пустой файл в нашей папке
         // =====================  -> переписываем в него файл пользователя  ===================================
+        logger.error("### Возникла ошибка при чтении/записи файла аватарки студента ###");
         try (InputStream is = file.getInputStream();
              OutputStream os = Files.newOutputStream(filepath, CREATE_NEW);
              BufferedInputStream bis = new BufferedInputStream(is, 1024);
@@ -61,10 +65,12 @@ public class StudentAvatarService {
         avatar.setPreview(generateImagePreview(filepath));
 
         avatarRepository.save(avatar);
+        logger.info("Файл аватарки студента создан");
     }
 
     // -------- делаем превьюшку из аватарки --------------------------------------------------
     private byte[] generateImagePreview(Path filepath) throws IOException {
+        logger.error("### Возникла ошибка при чтении/записи файла preview аватарки студента ###");
         try (InputStream is = Files.newInputStream(filepath);
              BufferedInputStream bis = new BufferedInputStream(is, 1024);
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -84,6 +90,7 @@ public class StudentAvatarService {
             graphics.dispose();
 
             ImageIO.write(preview, getExtension(filepath.getFileName().toString()), baos);
+            logger.info("Файл preview аватарки студента создан");
             return baos.toByteArray();
         }
     }
@@ -91,6 +98,7 @@ public class StudentAvatarService {
     // ------  находим аватарку студента по его id ----------------------
     // ------  Если ее нет, создаем новую аватарку ---------------------
     public Avatar findStudentAvatar(Long studentId) {
+        logger.info("Вызван метод findStudentAvatar");
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
 
@@ -98,12 +106,14 @@ public class StudentAvatarService {
     // --------  получаем списки аватарок постранично (пагинация)  --------
     public List<Avatar> getAllAvatars(int pageNumber, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+        logger.info("Вызван метод getAllAvatars");
         return avatarRepository.findAll(pageRequest).getContent();
     }
 
     // ==============================================================================
     // ----- определяем расширение файла аватарки ------------------------------
     private String getExtension(String originalFilename) {
+        logger.info("Вызван метод getExtension (получено расширение файла)");
         return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
     }
 
