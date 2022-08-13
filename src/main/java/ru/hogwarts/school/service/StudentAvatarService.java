@@ -24,7 +24,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 @Transactional
 public class StudentAvatarService {
-    Logger logger = LoggerFactory.getLogger(StudentAvatarService.class);
+    private final Logger logger = LoggerFactory.getLogger(StudentAvatarService.class);
 
     @Value("${students.avatars.dir.path}")
     private String avatarDir;
