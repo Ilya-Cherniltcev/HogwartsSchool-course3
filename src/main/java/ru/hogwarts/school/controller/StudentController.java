@@ -55,7 +55,7 @@ public class StudentController {
     @GetMapping("filter/{age}") // GET http://localhost:8080/student/filter/14
     public ResponseEntity<Collection<Student>> filterStudentsByAge(@PathVariable int age) {
         Collection<Student> ageStudent = studentService.filter(age);
-        if (ageStudent.isEmpty()) {
+        if (ageStudent == null || ageStudent.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(ageStudent, HttpStatus.OK);
@@ -65,7 +65,7 @@ public class StudentController {
     @GetMapping("filter") // GET http://localhost:8080/student/filter
     public ResponseEntity<Collection<Student>> filterStudentsByAge(@RequestParam int minAge, @RequestParam int maxAge) {
         Collection<Student> ageStudent = studentService.findStudentsByAgeBetween(minAge, maxAge);
-        if (ageStudent.isEmpty()) {
+        if (ageStudent == null || ageStudent.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(ageStudent, HttpStatus.OK);
@@ -92,4 +92,24 @@ public class StudentController {
         studentService.deleteStudent(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // =========  Домашка № 4.5 (Параллельные стримы)  ==========================================
+
+    // шаг 1  ---- получаем имена всех студентов, чье имя начинается с буквы {letter} ----------------
+    @GetMapping("filter/names/{letter}") // GET http://localhost:8080/student/filter/A
+    public ResponseEntity<List<String>> getNamesOfStudentsWithFirstLetter(@PathVariable char letter) {
+        List<String> studentNames = studentService.getNamesOfStudentsWithFirstLetter(letter);
+        if (studentNames == null || studentNames.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(studentNames, HttpStatus.OK);
+    }
+
+    // шаг 2  ---- возвращаем средний возраст всех студентов, используя стримы  ----------------
+    @GetMapping("averageAgeWithStreams") // GET http://localhost:8080/student/averageAgeStreams
+    public ResponseEntity<Double> getAvgAgeOfStudentsWithStreams() {
+        return new ResponseEntity<>(studentService.getAverageAgeOfStudentsWithStreams(), HttpStatus.OK);
+    }
+
+
 }

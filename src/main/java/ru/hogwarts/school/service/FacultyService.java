@@ -18,4 +18,7 @@ public interface FacultyService {
 
     Faculty getFacultyByStudentId(long studId);
 
+    // ========== Task 4.5 (Параллельные стримы) =============
+    String getFacultiesLongestName();
+
 }

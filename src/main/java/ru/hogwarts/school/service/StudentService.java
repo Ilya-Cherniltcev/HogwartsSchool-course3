@@ -29,4 +29,11 @@ public interface StudentService {
 
     // ======= Получение последних 5-ти студентов (у которых больше id) ===============
     List<Student> getLast5Students();
+
+    // ----- TASK 4.5 -----
+    // ---- Получение имен всех студентов, чье имя начинается с буквы {letter} ----
+    List<String> getNamesOfStudentsWithFirstLetter(char letter);
+
+    // шаг 2  ---- возвращаем средний возраст всех студентов, используя стримы  ----------------
+    Double getAverageAgeOfStudentsWithStreams();
 }

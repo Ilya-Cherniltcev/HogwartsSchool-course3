@@ -9,6 +9,7 @@ import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -86,5 +87,33 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> getLast5Students() {
         logger.info("Вызван метод getLast5Students");
         return studentRepository.getLast5Students();
+    }
+
+    // =============== TASK 4.5 ==============================
+    // =======================================================
+    // ---- Получение имен всех студентов, чье имя начинается с буквы {letter} ----
+    @Override
+    public List<String> getNamesOfStudentsWithFirstLetter(char letter) {
+        List<Student> allStudents = studentRepository.findAll();
+        char needLetter = Character.toUpperCase(letter);
+        List<String> allNames = allStudents.stream()
+                .map(t -> t.getName())
+                .filter(c -> c.startsWith(Character.toString(needLetter)))
+                .sorted()
+                .collect(Collectors.toList());
+
+        logger.debug("All suitable student's names are: {}", allNames.toString());
+        return allNames;
+    }
+
+    // шаг 2  ---- возвращаем средний возраст всех студентов, используя стримы  ----------------
+    @Override
+    public Double getAverageAgeOfStudentsWithStreams() {
+        List<Student> allStudents = studentRepository.findAll();
+        Double middleAge = allStudents.stream()
+                .mapToInt(t -> t.getAge())
+                .average().getAsDouble();
+        logger.debug("Average age of all students is - {}", middleAge);
+        return middleAge;
     }
 }

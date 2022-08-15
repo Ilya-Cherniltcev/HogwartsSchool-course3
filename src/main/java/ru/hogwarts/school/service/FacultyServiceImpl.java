@@ -8,6 +8,8 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -56,6 +58,18 @@ public class FacultyServiceImpl implements FacultyService {
     public void deleteFaculty(long idFac) {
         logger.info("Вызван метод deleteFaculty");
         facultyRepository.deleteById(idFac);
+    }
+
+    // ========== Task 4.5 (Параллельные стримы) =============
+    // ----- Шаг 3. Возвращаем самое длинное название факультета ---------------------
+    @Override
+    public String getFacultiesLongestName() {
+        List<Faculty> allFaculties = facultyRepository.findAll();
+        String theLongestName = allFaculties.stream()
+                .map(t -> t.getName())
+                .max(Comparator.comparing(String::length)).get();
+        logger.debug("The longest faculties name is '{}', and his length is {}", theLongestName, theLongestName.length());
+        return theLongestName;
     }
 
 }

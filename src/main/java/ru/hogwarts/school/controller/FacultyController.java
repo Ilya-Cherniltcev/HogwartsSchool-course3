@@ -69,4 +69,16 @@ public class FacultyController {
         facultyService.deleteFaculty(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // ========== Task 4.5 (Параллельные стримы) =============
+    // ----- Шаг 3. Возвращаем самое длинное название факультета ---------------------
+    @GetMapping("longestName") // GET http://localhost:8080/faculty/longestName
+    public ResponseEntity<String> getFacultiesLongestName() {
+        String facultyName = facultyService.getFacultiesLongestName();
+        if (facultyName == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(facultyName, HttpStatus.OK);
+    }
+
 }
