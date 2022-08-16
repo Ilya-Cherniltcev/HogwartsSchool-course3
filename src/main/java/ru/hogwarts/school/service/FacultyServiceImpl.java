@@ -67,7 +67,7 @@ public class FacultyServiceImpl implements FacultyService {
         List<Faculty> allFaculties = facultyRepository.findAll();
         String theLongestName = allFaculties.stream()
                 .map(t -> t.getName())
-                .max(Comparator.comparing(String::length)).get();
+                .max(Comparator.comparing(String::length)).orElseThrow();
         logger.debug("The longest faculties name is '{}', and his length is {}", theLongestName, theLongestName.length());
         return theLongestName;
     }

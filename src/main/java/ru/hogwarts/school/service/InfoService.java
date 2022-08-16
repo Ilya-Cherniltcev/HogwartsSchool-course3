@@ -5,5 +5,5 @@ public interface InfoService {
     Integer getThisPort();
 
 
-    Integer getSum();
+    Long getSum();
 }

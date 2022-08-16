@@ -9,6 +9,7 @@ import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,7 +98,7 @@ public class StudentServiceImpl implements StudentService {
         List<Student> allStudents = studentRepository.findAll();
         char needLetter = Character.toUpperCase(letter);
         List<String> allNames = allStudents.stream()
-                .map(t -> t.getName())
+                .map(t -> t.getName().toUpperCase(Locale.ROOT))
                 .filter(c -> c.startsWith(Character.toString(needLetter)))
                 .sorted()
                 .collect(Collectors.toList());
@@ -112,7 +113,7 @@ public class StudentServiceImpl implements StudentService {
         List<Student> allStudents = studentRepository.findAll();
         Double middleAge = allStudents.stream()
                 .mapToInt(t -> t.getAge())
-                .average().getAsDouble();
+                .average().orElseThrow();
         logger.debug("Average age of all students is - {}", middleAge);
         return middleAge;
     }

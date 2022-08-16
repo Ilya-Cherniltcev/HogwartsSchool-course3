@@ -32,12 +32,12 @@ public class InfoServiceImpl implements InfoService {
     //--- Шаг 4 -- возвращаем целочисленное значение, равное сумме всех чисел от 0 до 1 000 000 --
 
     @Override
-    public Integer getSum() {
+    public Long getSum() {
         // (1) *** вычисляем время выполнения операции суммирования первоначальным методом ***
         // ---- запускаем таймер -------
         long start = System.nanoTime();
         // ---- вычисляем ---
-        Integer value = Stream.
+        long value = Stream.
                 iterate(1, a -> a + 1)
                 .limit(1_000_000)
                 .reduce(0, (a, b) -> a + b);
@@ -50,7 +50,7 @@ public class InfoServiceImpl implements InfoService {
         // ---- запускаем таймер -------
         long start2 = System.nanoTime();
         // ---- вычисляем ---
-        Integer value2 = Stream
+        long value2 = Stream
                 .iterate(1, a -> a + 1)
                 .limit(1_000_000)
                 .parallel()

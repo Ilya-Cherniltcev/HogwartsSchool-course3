@@ -23,7 +23,7 @@ public class InfoController {
     // === Task 4.5 =======================================
     //--- Шаг 4 -- возвращаем целочисленное значение --
     @GetMapping("getSum") // GET http://localhost:8080/student/getSum
-    public ResponseEntity<Integer> getSum() {
+    public ResponseEntity<Long> getSum() {
         return new ResponseEntity<>(infoService.getSum(), HttpStatus.OK);
     }
 
