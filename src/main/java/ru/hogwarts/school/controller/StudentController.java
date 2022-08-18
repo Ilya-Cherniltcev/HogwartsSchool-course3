@@ -111,5 +111,17 @@ public class StudentController {
         return new ResponseEntity<>(studentService.getAverageAgeOfStudentsWithStreams(), HttpStatus.OK);
     }
 
+    // =========  Домашка № 4.6 (потоки)  ==========================================
+    // шаг 1  ---- получаем список всех студентов и выводим их в консоль  ----------------
+    @GetMapping("printAll") // GET http://localhost:8080/student/filter/printAll
+    public void printAllStudentsToConsole() {
+        studentService.printAllStudents();
+    }
+
+    // шаг 2  ---- получаем список всех студентов и выводим их в консоль синхронизированным методом ----------------
+    @GetMapping("printAllSynchro") // GET http://localhost:8080/student/filter/printAllSynchro
+    public void printAllStudentsToConsoleSynchro() {
+        studentService.printAllStudentsSynchro();
+    }
 
 }

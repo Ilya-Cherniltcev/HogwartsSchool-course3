@@ -1,8 +1,11 @@
 package ru.hogwarts.school.service;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exceptions.WrongNumberException;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
@@ -116,5 +119,78 @@ public class StudentServiceImpl implements StudentService {
                 .average().orElseThrow();
         logger.debug("Average age of all students is - {}", middleAge);
         return middleAge;
+    }
+
+    // =========  Домашка № 4.6 (потоки)  ==========================================
+    // шаг 1  ---- получаем список всех студентов и выводим их в консоль  ----------------
+
+    @Override
+    public void printAllStudents() {
+        List<String> allStudentsNames = getAllNames();
+        logger.debug("(1) --- печатаем коллекцию по порядку");
+        System.out.println(allStudentsNames);
+        logger.debug("(2) --- печатаем коллекцию, используя параллельные потоки --------------------------------");
+        int numberOfStudents = allStudentsNames.size();
+        new Thread(() -> {
+            for (int i = 0; i < 2; i++) {
+                System.out.println(allStudentsNames.get(i));
+            }
+        }).start();
+        new Thread(() -> {
+            for (int i = 2; i < 4; i++) {
+                System.out.println(allStudentsNames.get(i));
+            }
+        }).start();
+        new Thread(() -> {
+            for (int i = 4; i < numberOfStudents; i++) {
+                System.out.println(allStudentsNames.get(i));
+            }
+        }).start();
+    }
+
+    // шаг 2  ---- получаем список всех студентов и выводим их в консоль синхронизированным методом ----------------
+
+    @Override
+    public void printAllStudentsSynchro() {
+        List<String> allStudentsNames = getAllNames();
+        logger.debug("(1) --- печатаем коллекцию по порядку");
+        System.out.println(allStudentsNames);
+        logger.debug("(2) --- проверяем печать коллекции, используя синхронизацию --------------------------------");
+        int numberOfStudents = allStudentsNames.size();
+        new Thread(() -> {
+            for (int i = 0; i < 2; i++) {
+                printNameToConsoleSyncro(i, allStudentsNames);
+            }
+        }).start();
+        new Thread(() -> {
+            for (int i = 2; i < 4; i++) {
+                printNameToConsoleSyncro(i, allStudentsNames);
+            }
+        }).start();
+        new Thread(() -> {
+            for (int i = 4; i < numberOfStudents; i++) {
+                printNameToConsoleSyncro(i, allStudentsNames);
+            }
+        }).start();
+    }
+
+    // ### отдельный метод синхронизированного вывода в консоль ###
+    private void printNameToConsoleSyncro(int id, @NotNull List<String> names) {
+        synchronized (StudentServiceImpl.class) {
+            System.out.println(names.get(id));
+        }
+    }
+
+
+    // ### отдельный метод получения списка имен всех студентов ###
+    private List<String> getAllNames() {
+        // --- получаем список всех студентов ---
+        List<Student> allStudents = studentRepository.findAll();
+        List<String> allStudentsNames = allStudents.
+                stream()
+                .map(Student::getName)
+                .sorted()
+                .toList();
+        return allStudentsNames;
     }
 }
