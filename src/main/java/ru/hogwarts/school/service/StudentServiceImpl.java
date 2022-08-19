@@ -1,11 +1,8 @@
 package ru.hogwarts.school.service;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
-import ru.hogwarts.school.exceptions.WrongNumberException;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
@@ -156,29 +153,28 @@ public class StudentServiceImpl implements StudentService {
         logger.debug("(1) --- печатаем коллекцию по порядку");
         System.out.println(allStudentsNames);
         logger.debug("(2) --- проверяем печать коллекции, используя синхронизацию --------------------------------");
-        int numberOfStudents = allStudentsNames.size();
+
         new Thread(() -> {
-            for (int i = 0; i < 2; i++) {
-                printNameToConsoleSyncro(i, allStudentsNames);
-            }
+            String nameOfFirstStudent = allStudentsNames.get(0);
+            String nameOfSecondStudent = allStudentsNames.get(1);
+            printNameToConsoleSyncro(nameOfFirstStudent, nameOfSecondStudent);
         }).start();
         new Thread(() -> {
-            for (int i = 2; i < 4; i++) {
-                printNameToConsoleSyncro(i, allStudentsNames);
-            }
+            String nameOfFirstStudent = allStudentsNames.get(2);
+            String nameOfSecondStudent = allStudentsNames.get(3);
+            printNameToConsoleSyncro(nameOfFirstStudent, nameOfSecondStudent);
         }).start();
         new Thread(() -> {
-            for (int i = 4; i < numberOfStudents; i++) {
-                printNameToConsoleSyncro(i, allStudentsNames);
-            }
+            String nameOfFirstStudent = allStudentsNames.get(4);
+            String nameOfSecondStudent = allStudentsNames.get(5);
+            printNameToConsoleSyncro(nameOfFirstStudent, nameOfSecondStudent);
         }).start();
     }
 
     // ### отдельный метод синхронизированного вывода в консоль ###
-    private void printNameToConsoleSyncro(int id, @NotNull List<String> names) {
-        synchronized (StudentServiceImpl.class) {
-            System.out.println(names.get(id));
-        }
+    private synchronized void printNameToConsoleSyncro(String nameOfFirstStudent, String nameOfSecondStudent) {
+        System.out.println(nameOfFirstStudent);
+        System.out.println(nameOfSecondStudent);
     }
 
 

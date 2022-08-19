@@ -18,7 +18,8 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    @GetMapping("{id}") // GET http://localhost:8080/student/22
+    @GetMapping("{id}")
+    // GET http://localhost:8080/student/22
     public ResponseEntity<Student> getStudentById(@PathVariable long id) {
         Student student = studentService.getStudent(id);
         if (student == null) {
@@ -28,31 +29,36 @@ public class StudentController {
     }
 
     // ******** определяем всех студентов по id факультета ************
-    @GetMapping("id") // GET http://localhost:8080/student/id
+    @GetMapping("id")
+    // GET http://localhost:8080/student/id
     public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@RequestParam long facId) {
         return new ResponseEntity<>(studentService.getAllStudentsByFacultyId(facId), HttpStatus.OK);
     }
 
     // ///////////////// выводим общее число всех студентов \\\\\\\\\\\\\\\\\\\\\\\\\
-    @GetMapping("total") // GET http://localhost:8080/student/total
+    @GetMapping("total")
+    // GET http://localhost:8080/student/total
     public ResponseEntity<Integer> getNumberOfStudents() {
         return new ResponseEntity<>(studentService.getTotalNumberOfStudents(), HttpStatus.OK);
     }
 
     // ///////////////// выводим средний возраст студентов \\\\\\\\\\\\\\\\\\\\\\\\\
-    @GetMapping("averageAge") // GET http://localhost:8080/student/averageAge
+    @GetMapping("averageAge")
+    // GET http://localhost:8080/student/averageAge
     public ResponseEntity<Double> getAvgAgeOfStudents() {
         return new ResponseEntity<>(studentService.getAverageAgeOfStudents(), HttpStatus.OK);
     }
 
     // ///////////////// выводим последних 5-ти студентов (у которых больше id) \\\\\\\\\\\\\\\\\\\\\\\\\
-    @GetMapping("last5") // GET http://localhost:8080/student/last5
+    @GetMapping("last5")
+    // GET http://localhost:8080/student/last5
     public ResponseEntity<List<Student>> getLast5Students() {
         return new ResponseEntity<List<Student>>(studentService.getLast5Students(), HttpStatus.OK);
     }
 
     // =====   фильтруем студентов по конкретному возрасту ===========================
-    @GetMapping("filter/{age}") // GET http://localhost:8080/student/filter/14
+    @GetMapping("filter/{age}")
+    // GET http://localhost:8080/student/filter/14
     public ResponseEntity<Collection<Student>> filterStudentsByAge(@PathVariable int age) {
         Collection<Student> ageStudent = studentService.filter(age);
         if (ageStudent == null || ageStudent.isEmpty()) {
@@ -62,7 +68,8 @@ public class StudentController {
     }
 
     // =====   фильтруем студентов по возрасту в промежутке ===========================
-    @GetMapping("filter") // GET http://localhost:8080/student/filter
+    @GetMapping("filter")
+    // GET http://localhost:8080/student/filter
     public ResponseEntity<Collection<Student>> filterStudentsByAge(@RequestParam int minAge, @RequestParam int maxAge) {
         Collection<Student> ageStudent = studentService.findStudentsByAgeBetween(minAge, maxAge);
         if (ageStudent == null || ageStudent.isEmpty()) {
@@ -71,13 +78,15 @@ public class StudentController {
         return new ResponseEntity<>(ageStudent, HttpStatus.OK);
     }
 
-    @PostMapping // POST http://localhost:8080/student
+    @PostMapping
+    // POST http://localhost:8080/student
     public ResponseEntity<Student> createNewStudent(@RequestBody Student student) {
         return new ResponseEntity<>(studentService.createStudent(student), HttpStatus.CREATED);
         // 201 Created	Успешный код состояния HTTP сервера 201: создан
     }
 
-    @PutMapping // PUT http://localhost:8080/student
+    @PutMapping
+    // PUT http://localhost:8080/student
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
         Student studentTest = studentService.updateStudent(student);
         if (studentTest == null) {
@@ -87,7 +96,8 @@ public class StudentController {
         // 200 OK	Успешный код состояния HTTP сервера 200:
     }
 
-    @DeleteMapping("{id}") // DELETE http://localhost:8080/student/1
+    @DeleteMapping("{id}")
+    // DELETE http://localhost:8080/student/1
     public ResponseEntity deleteStudent(@PathVariable long id) {
         studentService.deleteStudent(id);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -96,7 +106,8 @@ public class StudentController {
     // =========  Домашка № 4.5 (Параллельные стримы)  ==========================================
 
     // шаг 1  ---- получаем имена всех студентов, чье имя начинается с буквы {letter} ----------------
-    @GetMapping("filter/names/{letter}") // GET http://localhost:8080/student/filter/A
+    @GetMapping("filter/names/{letter}")
+    // GET http://localhost:8080/student/filter/A
     public ResponseEntity<List<String>> getNamesOfStudentsWithFirstLetter(@PathVariable char letter) {
         List<String> studentNames = studentService.getNamesOfStudentsWithFirstLetter(letter);
         if (studentNames == null || studentNames.isEmpty()) {
@@ -106,20 +117,23 @@ public class StudentController {
     }
 
     // шаг 2  ---- возвращаем средний возраст всех студентов, используя стримы  ----------------
-    @GetMapping("averageAgeWithStreams") // GET http://localhost:8080/student/averageAgeStreams
+    @GetMapping("averageAgeWithStreams")
+    // GET http://localhost:8080/student/averageAgeStreams
     public ResponseEntity<Double> getAvgAgeOfStudentsWithStreams() {
         return new ResponseEntity<>(studentService.getAverageAgeOfStudentsWithStreams(), HttpStatus.OK);
     }
 
     // =========  Домашка № 4.6 (потоки)  ==========================================
     // шаг 1  ---- получаем список всех студентов и выводим их в консоль  ----------------
-    @GetMapping("printAll") // GET http://localhost:8080/student/filter/printAll
+    @GetMapping("printAll")
+    // GET http://localhost:8080/student/filter/printAll
     public void printAllStudentsToConsole() {
         studentService.printAllStudents();
     }
 
     // шаг 2  ---- получаем список всех студентов и выводим их в консоль синхронизированным методом ----------------
-    @GetMapping("printAllSynchro") // GET http://localhost:8080/student/filter/printAllSynchro
+    @GetMapping("printAllSynchro")
+    // GET http://localhost:8080/student/filter/printAllSynchro
     public void printAllStudentsToConsoleSynchro() {
         studentService.printAllStudentsSynchro();
     }
